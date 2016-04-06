@@ -13,7 +13,8 @@ RUN PKGS_main="php-cli php-fpm php-gd php-intl php-mbstring php-mcrypt php-mysql
     && yum -y clean all \
 
     # Add User (really needed?)
-    && adduser -s /sbin/nologin -r nginx \
+    && adduser -u 1000 -s /sbin/nologin -r nginx \
+    && usermod -u 1000 nginx \
 
     # Redirect logfile output to stderr/out
     && touch /var/log/php-fpm/{access,error}.log \
@@ -64,6 +65,8 @@ RUN { \
     } | tee /etc/php-fpm.d/zz-docker.conf \
     && echo 'xdebug.default_enable=0' >> /etc/php.d/xdebug.ini \
 
+VOLUME ["/data/app"]
+WORKDIR /data/app
 EXPOSE 9000
 
 CMD ["/usr/sbin/php-fpm", "--force-stderr",  "--nodaemonize", "--fpm-config", "/etc/php-fpm.conf", "-c", "/etc/php.ini"]
